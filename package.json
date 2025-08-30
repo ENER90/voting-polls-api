@@ -1,0 +1,47 @@
+{
+  "name": "voting-polls-api",
+  "version": "1.0.0",
+  "description": "API para sistema de votaciones y encuestas",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "voting",
+    "polls",
+    "api",
+    "typescript",
+    "express",
+    "mongodb"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.5.0",
+    "bcrypt": "^5.1.1",
+    "jsonwebtoken": "^9.0.2",
+    "cors": "^2.8.5",
+    "helmet": "^7.0.0",
+    "express-rate-limit": "^6.10.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.17",
+    "@types/bcrypt": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.2",
+    "@types/cors": "^2.8.13",
+    "@types/node": "^20.5.0",
+    "@types/jest": "^29.5.4",
+    "@types/supertest": "^2.0.12",
+    "typescript": "^5.1.6",
+    "ts-node-dev": "^2.0.0",
+    "jest": "^29.6.2",
+    "supertest": "^6.3.3",
+    "ts-jest": "^29.1.1"
+  }
+}

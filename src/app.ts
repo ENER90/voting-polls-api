@@ -1,5 +1,10 @@
 import express from "express";
 import cors from "cors";
+import {
+  getDatabaseStatus,
+  databaseHealthCheck,
+  checkDatabaseConnection,
+} from "./middlewares/database.middleware";
 
 const app = express();
 
@@ -15,9 +20,17 @@ app.use(express.urlencoded({ extended: true }));
 
 // Health check route
 app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "OK",
+  const dbStatus = getDatabaseStatus();
+  const isHealthy = dbStatus.status === "connected";
+
+  res.status(isHealthy ? 200 : 503).json({
+    status: isHealthy ? "OK" : "DEGRADED",
     message: "Voting & Polls API is running!",
+    services: {
+      api: "OK",
+      database: dbStatus.status,
+    },
+    database: dbStatus,
     timestamp: new Date().toISOString(),
   });
 });
@@ -30,7 +43,19 @@ app.get("/api", (req, res) => {
     endpoints: {
       health: "/health",
       api: "/api",
+      database: "/api/database",
     },
+  });
+});
+
+// Database status endpoint
+app.get("/api/database", databaseHealthCheck);
+
+// Example of protected route (requires database connection)
+app.get("/api/protected", checkDatabaseConnection, (req, res) => {
+  res.json({
+    message: "This route requires database connection",
+    timestamp: new Date().toISOString(),
   });
 });
 

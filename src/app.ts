@@ -5,6 +5,12 @@ import {
   databaseHealthCheck,
   checkDatabaseConnection,
 } from "./middlewares/database.middleware";
+import {
+  authenticateToken,
+  requireRole,
+  requireAuth,
+  AuthenticatedRequest,
+} from "./middlewares/auth.middleware";
 
 const app = express();
 
@@ -59,7 +65,58 @@ app.get("/api/protected", checkDatabaseConnection, (req, res) => {
   });
 });
 
-// 404 handler
+// 🔐 AUTH MIDDLEWARE EXAMPLES
+
+app.get("/api/public", (req, res) => {
+  res.json({
+    message: "This is a public route, no authentication required",
+    timestamp: new Date().toISOString(),
+  });
+});
+
+app.get(
+  "/api/auth/profile",
+  authenticateToken,
+  (req: AuthenticatedRequest, res) => {
+    res.json({
+      message: "User profile data",
+      user: {
+        id: req.user?.userId,
+        email: req.user?.email,
+        role: req.user?.role,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }
+);
+
+app.get(
+  "/api/admin/users",
+  ...requireAuth("admin"),
+  (req: AuthenticatedRequest, res) => {
+    res.json({
+      message: "Admin route - List all users",
+      adminUser: req.user?.email,
+      timestamp: new Date().toISOString(),
+    });
+  }
+);
+
+app.get(
+  "/api/dashboard",
+  ...requireAuth(["user", "admin"]),
+  (req: AuthenticatedRequest, res) => {
+    res.json({
+      message: "Dashboard data for authenticated users",
+      user: {
+        email: req.user?.email,
+        role: req.user?.role,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }
+);
+
 app.use("*", (req, res) => {
   res.status(404).json({
     error: "Route not found",

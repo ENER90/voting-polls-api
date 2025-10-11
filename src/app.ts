@@ -11,6 +11,7 @@ import {
   requireAuth,
   AuthenticatedRequest,
 } from "./middlewares/auth.middleware";
+import authRoutes from "./routes/auth.routes";
 
 const app = express();
 
@@ -50,12 +51,20 @@ app.get("/api", (req, res) => {
       health: "/health",
       api: "/api",
       database: "/api/database",
+      auth: {
+        register: "POST /api/auth/register",
+        login: "POST /api/auth/login",
+        profile: "GET /api/auth/me (requires auth)",
+      },
     },
   });
 });
 
 // Database status endpoint
 app.get("/api/database", databaseHealthCheck);
+
+// 🔐 Auth routes
+app.use("/api/auth", authRoutes);
 
 // Example of protected route (requires database connection)
 app.get("/api/protected", checkDatabaseConnection, (req, res) => {

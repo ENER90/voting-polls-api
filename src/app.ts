@@ -12,6 +12,7 @@ import {
   AuthenticatedRequest,
 } from "./middlewares/auth.middleware";
 import authRoutes from "./routes/auth.routes";
+import pollRoutes from "./routes/poll.routes";
 
 const app = express();
 
@@ -56,6 +57,13 @@ app.get("/api", (req, res) => {
         login: "POST /api/auth/login",
         profile: "GET /api/auth/me (requires auth)",
       },
+      polls: {
+        getAll: "GET /api/polls",
+        getById: "GET /api/polls/:id",
+        create: "POST /api/polls (requires auth)",
+        update: "PUT /api/polls/:id (requires auth + ownership)",
+        delete: "DELETE /api/polls/:id (requires auth + ownership)",
+      },
     },
   });
 });
@@ -65,6 +73,9 @@ app.get("/api/database", databaseHealthCheck);
 
 // 🔐 Auth routes
 app.use("/api/auth", authRoutes);
+
+// 📊 Poll routes
+app.use("/api/polls", pollRoutes);
 
 // Example of protected route (requires database connection)
 app.get("/api/protected", checkDatabaseConnection, (req, res) => {

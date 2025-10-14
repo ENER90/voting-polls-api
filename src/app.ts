@@ -13,10 +13,10 @@ import {
 } from "./middlewares/auth.middleware";
 import authRoutes from "./routes/auth.routes";
 import pollRoutes from "./routes/poll.routes";
+import voteRoutes from "./routes/vote.routes";
 
 const app = express();
 
-// Middlewares
 app.use(
   cors({
     origin: process.env.CORS_ORIGIN || "http://localhost:3002",
@@ -26,7 +26,6 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Health check route
 app.get("/health", (req, res) => {
   const dbStatus = getDatabaseStatus();
   const isHealthy = dbStatus.status === "connected";
@@ -43,7 +42,6 @@ app.get("/health", (req, res) => {
   });
 });
 
-// API routes will be added here
 app.get("/api", (req, res) => {
   res.json({
     message: "Welcome to Voting & Polls API",
@@ -64,28 +62,29 @@ app.get("/api", (req, res) => {
         update: "PUT /api/polls/:id (requires auth + ownership)",
         delete: "DELETE /api/polls/:id (requires auth + ownership)",
       },
+      votes: {
+        cast: "POST /api/votes (requires auth)",
+        results: "GET /api/votes/results/:pollId",
+        myVotes: "GET /api/votes/my-votes (requires auth)",
+      },
     },
   });
 });
 
-// Database status endpoint
 app.get("/api/database", databaseHealthCheck);
 
-// 🔐 Auth routes
 app.use("/api/auth", authRoutes);
 
-// 📊 Poll routes
 app.use("/api/polls", pollRoutes);
 
-// Example of protected route (requires database connection)
+app.use("/api/votes", voteRoutes);
+
 app.get("/api/protected", checkDatabaseConnection, (req, res) => {
   res.json({
     message: "This route requires database connection",
     timestamp: new Date().toISOString(),
   });
 });
-
-// 🔐 AUTH MIDDLEWARE EXAMPLES
 
 app.get("/api/public", (req, res) => {
   res.json({

@@ -14,6 +14,7 @@ import {
 import authRoutes from "./routes/auth.routes";
 import pollRoutes from "./routes/poll.routes";
 import voteRoutes from "./routes/vote.routes";
+import { errorHandler } from "./middlewares/error.middleware";
 
 const app = express();
 
@@ -142,5 +143,7 @@ app.use("*", (req, res) => {
     message: `Cannot ${req.method} ${req.originalUrl}`,
   });
 });
+
+app.use(errorHandler);
 
 export default app;
